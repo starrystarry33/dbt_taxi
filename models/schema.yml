@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_yellow_tripdata
+    description: "Staging: raw yellow taxi trips from the external table, columns renamed to snake_case"
+
+  - name: dim_zones
+    description: "Taxi zone dimension, one row per location_id"
+    columns:
+      - name: location_id
+        description: "TLC location id"
+        data_tests:
+          - unique
+          - not_null
+      - name: borough
+        description: "NYC borough"
+      - name: zone
+        description: "Taxi zone name"
+      - name: service_zone
+        description: "Service zone category"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Yellow Zone', 'Boro Zone', 'EWR', 'Airports', 'N/A']
+
+  - name: fct_trips
+    description: "One row per yellow taxi trip"
+    columns:
+      - name: pickup_datetime
+        data_tests:
+          - not_null
+      - name: pickup_location_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_zones')
+                field: location_id
+      - name: dropoff_location_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_zones')
+                field: location_id
+
+  - name: mart_daily_trips
+    description: "Daily trip aggregates: trip count, total fare, average trip distance"

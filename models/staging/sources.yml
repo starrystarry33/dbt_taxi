@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: taxi
+    database: ny-rides-zoom
+    schema: taxi_dataset
+    tables:
+      - name: yellow_taxi_2021_01_ext
